@@ -1,6 +1,7 @@
 'use strict';
 const h = require('../helpers');
 const passport  = require('passport');
+const config = require('../config')
 module.exports = ()=> {
     let routes = {
         'get': {
@@ -9,13 +10,23 @@ module.exports = ()=> {
             },
             '/rooms': [h.isAuthenticated,(req, res, next) => {
                 res.render('rooms',{
-                    user:req.user
+                    user:req.user,
+                    host:config.host
                 });
-                console.log(req.user.fullName);
             }],
-            '/chat': (req, res, next) => {
-                res.render('chat');
-            },
+            '/chat/:id': [h.isAuthenticated,(req, res, next) => {
+                let getRoom = h.findRoomById(req.app.locals.chatrooms, req.params.id);
+                if(getRoom === undefined) {
+                    return next();
+                } else {
+                    res.render('chatroom', {
+                        user: req.user,
+                        host: config.host,
+                        room: getRoom.room,
+                        roomID: getRoom.roomID
+                    });
+                }
+            }],
             '/auth/facebook':passport.authenticate('facebook'),
             '/auth/facebook/callback':passport.authenticate('facebook',{
                 successRedirect:'/rooms',

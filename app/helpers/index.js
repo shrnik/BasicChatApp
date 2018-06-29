@@ -1,6 +1,7 @@
 'use strict';
 const router  = require('express').Router();
 const db = require('../db')
+const crypto = require('crypto');
 
 let _registerRoutes = (routes, method) => {
     for (let key in routes) {
@@ -82,10 +83,97 @@ let createNewUser = profile =>{
     })
 };
 
+let findRoomByName = (allrooms, room) => {
+    let findRoom = allrooms.findIndex((element) => {
+        if(element.room === room) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+    return findRoom > -1 ? true : false;
+}
+
+
+//Generate Unique room ID
+
+let randomHex=()=>{
+    return crypto.randomBytes(24).toString('hex');
+}
+
+
+
+let findRoomById = (allrooms, roomID) => {
+    return allrooms.find((element, index, array) => {
+        if(element.roomID === roomID) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+}
+
+
+// Add a user to a chatroom
+let addUserToRoom = (allrooms, data, socket) => {
+    // Get the room object
+    let getRoom = findRoomById(allrooms, data.roomID);
+    if(getRoom !== undefined) {
+        let userID = socket.request.session.passport.user;
+
+        let checkUser = getRoom.users.findIndex((element) => {
+            if(element.userID === userID) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+
+        if(checkUser > -1) {
+            getRoom.users.splice(checkUser, 1);
+        }
+
+        getRoom.users.push({
+            socketID: socket.id,
+            userID,
+            user: data.user,
+            userPic: data.userPic
+        });
+        socket.join(data.roomID);
+
+        return getRoom;
+    }
+}
+
+let removeUserFromRoom = (allrooms, socket) => {
+    for(let room of allrooms) {
+        // Find the user
+        let findUser = room.users.findIndex((element, index, array) => {
+            if(element.socketID === socket.id) {
+                return true;
+            } else {
+                return false;
+            }
+            // return element.socketID === socket.id ? true : false
+        });
+
+        if(findUser > -1) {
+            socket.leave(room.roomID);
+            room.users.splice(findUser, 1);
+            return room;
+        }
+    }
+}
 module.exports={
     route,
     findOne,
     createNewUser,
     findByID,
-    isAuthenticated
+    isAuthenticated,
+    findRoomByName,
+    randomHex,
+    findRoomById,
+    addUserToRoom,
+    removeUserFromRoom
 };

@@ -7,10 +7,6 @@ const db = require('../db')
 
 module.exports = ()=>{
     passport.serializeUser((user,done)=>{
-        console.log(
-            "This outputs a complete" +
-            "User Profile object when the user logs in.",
-            user);
         done(null,user.id);
     });
 
@@ -25,12 +21,7 @@ module.exports = ()=>{
         //         done(null,user);
         //     })
         //     .catch(error =>console.log('Error when deserializing '));
-        db.userModel.findById(id, function(err, user) {
-            console.log(
-                            "This outputs a complete" +
-                            "User Profile object when the user logs in.",
-                            user.fullName);
-            done(err, user);
+        db.userModel.findById(id, function(err, user) {done(err, user);
         });
     });
 
