@@ -4,9 +4,9 @@ require('./auth')();
 
 //IO server
 
-let ioServer = app=>{
+let ioServer = (app,credentials)=>{
     app.locals.chatrooms = [];
-    const server = require('https').Server(app);
+    const server = require('https').Server(credentials,app);
     const io  = require('socket.io')(server);
     io.use((socket,next)=>{
         require('./session')(socket.request,{},next);

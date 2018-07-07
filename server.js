@@ -1,4 +1,5 @@
 'use strict';
+const fs = require( 'fs' );
 
 const express = require('express');
 const app = express();
@@ -14,6 +15,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/',chatApp.router);
 
-chatApp.ioServer(app).listen(app.get('port'),()=>{
+const privateKey = fs.readFileSync('./key.pem');
+const certificate = fs.readFileSync('./cert.pem');
+const credentials = {key: privateKey, cert: certificate,requestCert: false,
+    rejectUnauthorized: false};
+
+chatApp.ioServer(app,credentials).listen(app.get('port'),()=>{
     console.log('ChatApp running at Port:',app.get('port'));
 });
