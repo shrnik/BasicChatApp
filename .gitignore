@@ -2,9 +2,11 @@
 node_modules
 
 #Dev Config
-app/config/development.js
+app/config/development.json
 
 #Windows
 _windows
 
 codestyles
+
+.idea
