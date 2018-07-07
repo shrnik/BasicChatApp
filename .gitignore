@@ -3,3 +3,8 @@ node_modules
 
 #Dev Config
 app/config/development.js
+
+#Windows
+_windows
+
+codestyles
