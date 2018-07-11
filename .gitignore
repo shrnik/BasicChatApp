@@ -1,0 +1,12 @@
+#Node Dependencies
+node_modules
+
+#Dev Config
+app/config/development.json
+
+#Windows
+_windows
+
+codestyles
+
+.idea
